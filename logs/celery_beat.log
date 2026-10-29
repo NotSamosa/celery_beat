@@ -1,0 +1,6 @@
+[2026-10-29 16:06:49,383: INFO/MainProcess] beat: Starting...
+[2026-10-29 16:06:49,399: INFO/MainProcess] Scheduler: Sending due task Hourly Status Check Task (scheduler.tasks.hourly_status_check_task)
+[2026-10-29 16:06:49,405: INFO/MainProcess] Scheduler: Sending due task Process Scheduled Campaigns (Every 5 mins) (scheduler.tasks.process_scheduled_campaigns)
+[2026-10-29 16:06:49,406: INFO/MainProcess] Scheduler: Sending due task scheduler_tasks_hourly_status_check_task_20261029_155613_73c20d (scheduler.tasks.hourly_status_check_task)
+[2026-10-29 16:06:53,422: INFO/MainProcess] DatabaseScheduler: Schedule changed.
+[2026-10-29 16:06:57,188: INFO/MainProcess] Scheduler: Sending due task beat_live_verification_task (scheduler.tasks.hourly_status_check_task)

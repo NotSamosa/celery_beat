@@ -1,0 +1,191 @@
+ 
+ -------------- celery@MacBook-Air.local v5.6.3 (recovery)
+--- ***** ----- 
+-- ******* ---- macOS-27.2-arm64-arm-64bit-Mach-O 2026-10-29 16:06:49
+- *** --- * --- 
+- ** ---------- [config]
+- ** ---------- .> app:         config:0x109166f90
+- ** ---------- .> transport:   redis://127.0.0.1:6379/0
+- ** ---------- .> results:     
+- *** --- * --- .> concurrency: 10 (solo)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> celery           exchange=celery(direct) key=celery
+                
+
+[tasks]
+  . scheduler.tasks.check_birthday_anniversary_reminders
+  . scheduler.tasks.daily_report_task
+  . scheduler.tasks.email_scheduler_task
+  . scheduler.tasks.execute_dynamic_task
+  . scheduler.tasks.failure_notification_task
+  . scheduler.tasks.hourly_status_check_task
+  . scheduler.tasks.process_scheduled_campaigns
+  . scheduler.tasks.weekday_standup_report_task
+  . scheduler.tasks.weekly_cleanup_task
+
+[2026-10-29 16:06:49,409: INFO/MainProcess] Connected to redis://127.0.0.1:6379/0
+[2026-10-29 16:06:49,410: INFO/MainProcess] mingle: searching for neighbors
+[2026-10-29 16:06:50,416: INFO/MainProcess] mingle: all alone
+[2026-10-29 16:06:50,435: INFO/MainProcess] celery@MacBook-Air.local ready.
+[2026-10-29 16:06:50,436: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[f97b64f6-5758-4be8-86fe-cb9474c1aafd] received
+[2026-10-29 16:06:50,450: WARNING/MainProcess] Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Subject: Demo Booking Confirmation
+From: noreply@scheduler.local
+To: lead@business.com
+Date: Thu, 29 Oct 2026 16:06:50 +0000
+Message-ID: <179329001044.63987.1251865042793533891@1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa>
+
+Your demo is booked.
+[2026-10-29 16:06:50,450: WARNING/MainProcess] -------------------------------------------------------------------------------
+[2026-10-29 16:06:50,451: INFO/MainProcess] Email successfully sent to lead@business.com (Task ID: f97b64f6-5758-4be8-86fe-cb9474c1aafd)
+[2026-10-29 16:06:50,452: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[f97b64f6-5758-4be8-86fe-cb9474c1aafd] succeeded in 0.015371584006061312s: {'status': 'SENT', 'recipient_email': 'lead@business.com', 'sent_at': '2026-10-29T16:06:50.450389+00:00', 'task_id': 'f97b64f6-5758-4be8-86fe-cb9474c1aafd'}
+[2026-10-29 16:06:50,453: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[9e4137b2-ec56-4b7a-9631-0994f0438577] received
+[2026-10-29 16:06:50,455: WARNING/MainProcess] Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Subject: Happy Birthday, johndoe!
+From: noreply@scheduler.local
+To: john@example.com
+Date: Thu, 29 Oct 2026 16:06:50 +0000
+Message-ID: <179329001045.63987.9159063924073164769@1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa>
+
+Dear johndoe,
+
+Wishing you a fantastic birthday and a great year ahead!
+
+Best regards,
+The Team
+[2026-10-29 16:06:50,455: WARNING/MainProcess] -------------------------------------------------------------------------------
+[2026-10-29 16:06:50,456: INFO/MainProcess] Email successfully sent to john@example.com (Task ID: 9e4137b2-ec56-4b7a-9631-0994f0438577)
+[2026-10-29 16:06:50,457: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[9e4137b2-ec56-4b7a-9631-0994f0438577] succeeded in 0.004118166005355306s: {'status': 'SENT', 'recipient_email': 'john@example.com', 'sent_at': '2026-10-29T16:06:50.455869+00:00', 'task_id': '9e4137b2-ec56-4b7a-9631-0994f0438577'}
+[2026-10-29 16:06:50,458: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[dce29a66-2665-44be-8563-3613b1de96e7] received
+[2026-10-29 16:06:50,460: WARNING/MainProcess] Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Subject: Happy Anniversary, johndoe!
+From: noreply@scheduler.local
+To: john@example.com
+Date: Thu, 29 Oct 2026 16:06:50 +0000
+Message-ID: <179329001046.63987.1223394765716193644@1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa>
+
+Dear johndoe,
+
+Congratulations on your anniversary! Wishing you continued happiness.
+
+Best regards,
+The Team
+[2026-10-29 16:06:50,460: WARNING/MainProcess] -------------------------------------------------------------------------------
+[2026-10-29 16:06:50,460: INFO/MainProcess] Email successfully sent to john@example.com (Task ID: dce29a66-2665-44be-8563-3613b1de96e7)
+[2026-10-29 16:06:50,461: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[dce29a66-2665-44be-8563-3613b1de96e7] succeeded in 0.0033126249982160516s: {'status': 'SENT', 'recipient_email': 'john@example.com', 'sent_at': '2026-10-29T16:06:50.460526+00:00', 'task_id': 'dce29a66-2665-44be-8563-3613b1de96e7'}
+[2026-10-29 16:06:50,462: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[14082b12-914a-4fbb-8fda-d8ce5f326a72] received
+[2026-10-29 16:06:50,464: WARNING/MainProcess] Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Subject: Promo Update
+From: noreply@scheduler.local
+To: john@example.com
+Date: Thu, 29 Oct 2026 16:06:50 +0000
+Message-ID: <179329001046.63987.9885055648431394096@1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa>
+
+Enjoy our end of year offers!
+[2026-10-29 16:06:50,464: WARNING/MainProcess] -------------------------------------------------------------------------------
+[2026-10-29 16:06:50,465: INFO/MainProcess] Email successfully sent to john@example.com (Task ID: 14082b12-914a-4fbb-8fda-d8ce5f326a72)
+[2026-10-29 16:06:50,465: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[14082b12-914a-4fbb-8fda-d8ce5f326a72] succeeded in 0.003155332997266669s: {'status': 'SENT', 'recipient_email': 'john@example.com', 'sent_at': '2026-10-29T16:06:50.464633+00:00', 'task_id': '14082b12-914a-4fbb-8fda-d8ce5f326a72'}
+[2026-10-29 16:06:50,466: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[74d9b9b7-2cd9-483e-8f63-8febde7b7da7] received
+[2026-10-29 16:06:50,468: WARNING/MainProcess] Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Subject: Demo Booking Confirmation
+From: noreply@scheduler.local
+To: lead@business.com
+Date: Thu, 29 Oct 2026 16:06:50 +0000
+Message-ID: <179329001046.63987.5902581874961176127@1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa>
+
+Your demo is booked.
+[2026-10-29 16:06:50,468: WARNING/MainProcess] -------------------------------------------------------------------------------
+[2026-10-29 16:06:50,468: INFO/MainProcess] Email successfully sent to lead@business.com (Task ID: 74d9b9b7-2cd9-483e-8f63-8febde7b7da7)
+[2026-10-29 16:06:50,469: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[74d9b9b7-2cd9-483e-8f63-8febde7b7da7] succeeded in 0.002857874998881016s: {'status': 'SENT', 'recipient_email': 'lead@business.com', 'sent_at': '2026-10-29T16:06:50.468347+00:00', 'task_id': '74d9b9b7-2cd9-483e-8f63-8febde7b7da7'}
+[2026-10-29 16:06:50,470: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[b42590b8-ec8e-4296-bdff-97a78b8889c4] received
+[2026-10-29 16:06:50,471: WARNING/MainProcess] Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Subject: Happy Birthday, johndoe!
+From: noreply@scheduler.local
+To: john@example.com
+Date: Thu, 29 Oct 2026 16:06:50 +0000
+Message-ID: <179329001047.63987.6038372617380653413@1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa>
+
+Dear johndoe,
+
+Wishing you a fantastic birthday and a great year ahead!
+
+Best regards,
+The Team
+[2026-10-29 16:06:50,472: WARNING/MainProcess] -------------------------------------------------------------------------------
+[2026-10-29 16:06:50,472: INFO/MainProcess] Email successfully sent to john@example.com (Task ID: b42590b8-ec8e-4296-bdff-97a78b8889c4)
+[2026-10-29 16:06:50,473: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[b42590b8-ec8e-4296-bdff-97a78b8889c4] succeeded in 0.0030745420008315705s: {'status': 'SENT', 'recipient_email': 'john@example.com', 'sent_at': '2026-10-29T16:06:50.472045+00:00', 'task_id': 'b42590b8-ec8e-4296-bdff-97a78b8889c4'}
+[2026-10-29 16:06:50,473: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[5b3e8136-3f9b-4c59-8d59-5361482304ab] received
+[2026-10-29 16:06:50,475: WARNING/MainProcess] Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Subject: Happy Anniversary, johndoe!
+From: noreply@scheduler.local
+To: john@example.com
+Date: Thu, 29 Oct 2026 16:06:50 +0000
+Message-ID: <179329001047.63987.3018956726936298107@1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa>
+
+Dear johndoe,
+
+Congratulations on your anniversary! Wishing you continued happiness.
+
+Best regards,
+The Team
+[2026-10-29 16:06:50,475: WARNING/MainProcess] -------------------------------------------------------------------------------
+[2026-10-29 16:06:50,475: INFO/MainProcess] Email successfully sent to john@example.com (Task ID: 5b3e8136-3f9b-4c59-8d59-5361482304ab)
+[2026-10-29 16:06:50,476: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[5b3e8136-3f9b-4c59-8d59-5361482304ab] succeeded in 0.0027867079988936894s: {'status': 'SENT', 'recipient_email': 'john@example.com', 'sent_at': '2026-10-29T16:06:50.475501+00:00', 'task_id': '5b3e8136-3f9b-4c59-8d59-5361482304ab'}
+[2026-10-29 16:06:50,477: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[0bb00cde-1ea6-4aa5-95e7-600c14ab464d] received
+[2026-10-29 16:06:50,478: WARNING/MainProcess] Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Subject: Promo Update
+From: noreply@scheduler.local
+To: john@example.com
+Date: Thu, 29 Oct 2026 16:06:50 +0000
+Message-ID: <179329001047.63987.10001884508676428646@1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa>
+
+Enjoy our end of year offers!
+[2026-10-29 16:06:50,478: WARNING/MainProcess] -------------------------------------------------------------------------------
+[2026-10-29 16:06:50,479: INFO/MainProcess] Email successfully sent to john@example.com (Task ID: 0bb00cde-1ea6-4aa5-95e7-600c14ab464d)
+[2026-10-29 16:06:50,479: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[0bb00cde-1ea6-4aa5-95e7-600c14ab464d] succeeded in 0.002625500004796777s: {'status': 'SENT', 'recipient_email': 'john@example.com', 'sent_at': '2026-10-29T16:06:50.478890+00:00', 'task_id': '0bb00cde-1ea6-4aa5-95e7-600c14ab464d'}
+[2026-10-29 16:06:50,480: INFO/MainProcess] Task scheduler.tasks.hourly_status_check_task[8f16147c-7556-4111-ad34-0f5d33882c49] received
+[2026-10-29 16:06:50,481: INFO/MainProcess] hourly_status_check_task executed successfully at 2026-10-29 16:06:50.481435+00:00
+[2026-10-29 16:06:50,482: INFO/MainProcess] Task scheduler.tasks.hourly_status_check_task[8f16147c-7556-4111-ad34-0f5d33882c49] succeeded in 0.0020310420004534535s: {'timestamp': '2026-10-29T16:06:50.481435+00:00', 'database': 'Connected', 'redis_broker': 'Operational', 'status': 'All systems normal'}
+[2026-10-29 16:06:50,483: INFO/MainProcess] Task scheduler.tasks.process_scheduled_campaigns[c607ad1e-2877-4d10-963b-87aa02abccf8] received
+[2026-10-29 16:06:50,485: INFO/MainProcess] Task scheduler.tasks.process_scheduled_campaigns[c607ad1e-2877-4d10-963b-87aa02abccf8] succeeded in 0.001988625001104083s: {'campaigns_processed': 0, 'emails_dispatched': 0}
+[2026-10-29 16:06:50,485: INFO/MainProcess] Task scheduler.tasks.hourly_status_check_task[36809f62-1b1f-420e-9010-30cee1475f36] received
+[2026-10-29 16:06:50,487: INFO/MainProcess] hourly_status_check_task executed successfully at 2026-10-29 16:06:50.486692+00:00
+[2026-10-29 16:06:50,487: INFO/MainProcess] Task scheduler.tasks.hourly_status_check_task[36809f62-1b1f-420e-9010-30cee1475f36] succeeded in 0.0020994579972466454s: {'timestamp': '2026-10-29T16:06:50.486692+00:00', 'database': 'Connected', 'redis_broker': 'Operational', 'status': 'All systems normal'}
+[2026-10-29 16:06:52,182: INFO/MainProcess] Task scheduler.tasks.hourly_status_check_task[09e4a087-2a14-4931-93be-ab568bd70793] received
+[2026-10-29 16:06:52,184: INFO/MainProcess] hourly_status_check_task executed successfully at 2026-10-29 16:06:52.184461+00:00
+[2026-10-29 16:06:52,185: INFO/MainProcess] Task scheduler.tasks.hourly_status_check_task[09e4a087-2a14-4931-93be-ab568bd70793] succeeded in 0.0024219170009018853s: {'timestamp': '2026-10-29T16:06:52.184461+00:00', 'database': 'Connected', 'redis_broker': 'Operational', 'status': 'All systems normal'}
+[2026-10-29 16:06:52,186: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[14d3edeb-ca00-44f3-b0ec-69f77b48204e] received
+[2026-10-29 16:06:52,190: WARNING/MainProcess] Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Subject: Live Task Execution Test
+From: noreply@scheduler.local
+To: internship_verifier@example.com
+Date: Thu, 29 Oct 2026 16:06:52 +0000
+Message-ID: <179329001219.63987.13456334274358502749@1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa>
+
+This email verifies Celery Worker and Beat are processing jobs.
+[2026-10-29 16:06:52,190: WARNING/MainProcess] -------------------------------------------------------------------------------
+[2026-10-29 16:06:52,190: INFO/MainProcess] Email successfully sent to internship_verifier@example.com (Task ID: 14d3edeb-ca00-44f3-b0ec-69f77b48204e)
+[2026-10-29 16:06:52,191: INFO/MainProcess] Task scheduler.tasks.email_scheduler_task[14d3edeb-ca00-44f3-b0ec-69f77b48204e] succeeded in 0.00525299999571871s: {'status': 'SENT', 'recipient_email': 'internship_verifier@example.com', 'sent_at': '2026-10-29T16:06:52.190384+00:00', 'task_id': '14d3edeb-ca00-44f3-b0ec-69f77b48204e'}
+[2026-10-29 16:06:57,190: INFO/MainProcess] Task scheduler.tasks.hourly_status_check_task[d97987e3-e42d-41fc-ad2c-c9ba36d504ed] received
+[2026-10-29 16:06:57,195: INFO/MainProcess] hourly_status_check_task executed successfully at 2026-10-29 16:06:57.194216+00:00
+[2026-10-29 16:06:57,196: INFO/MainProcess] Task scheduler.tasks.hourly_status_check_task[d97987e3-e42d-41fc-ad2c-c9ba36d504ed] succeeded in 0.00587154200184159s: {'timestamp': '2026-10-29T16:06:57.194216+00:00', 'database': 'Connected', 'redis_broker': 'Operational', 'status': 'All systems normal'}
