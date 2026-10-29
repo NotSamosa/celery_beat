@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, ScheduledEmail, PeriodicTaskLog
+from .models import User, ScheduledEmail, EmailCampaign, PeriodicTaskLog
 
 
 @admin.register(User)
@@ -18,6 +18,13 @@ class ScheduledEmailAdmin(admin.ModelAdmin):
     list_display = ('subject', 'recipient_email', 'category', 'scheduled_time', 'status', 'task_id', 'created_at')
     list_filter = ('status', 'category')
     search_fields = ('subject', 'recipient_email', 'task_id')
+
+
+@admin.register(EmailCampaign)
+class EmailCampaignAdmin(admin.ModelAdmin):
+    list_display = ('name', 'subject', 'scheduled_time', 'status', 'total_recipients', 'sent_count', 'created_at')
+    list_filter = ('status',)
+    search_fields = ('name', 'subject')
 
 
 @admin.register(PeriodicTaskLog)

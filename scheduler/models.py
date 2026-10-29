@@ -47,6 +47,30 @@ class ScheduledEmail(models.Model):
         return f"{self.subject} to {self.recipient_email} ({self.status})"
 
 
+class EmailCampaign(models.Model):
+    STATUS_CHOICES = [
+        ('DRAFT', 'Draft'),
+        ('SCHEDULED', 'Scheduled'),
+        ('IN_PROGRESS', 'In Progress'),
+        ('COMPLETED', 'Completed'),
+        ('CANCELLED', 'Cancelled'),
+    ]
+
+    name = models.CharField(max_length=255)
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    scheduled_time = models.DateTimeField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='SCHEDULED')
+    target_timezone = models.CharField(max_length=63, blank=True, default='')
+    total_recipients = models.IntegerField(default=0)
+    sent_count = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.status})"
+
+
 class PeriodicTaskLog(models.Model):
     task_name = models.CharField(max_length=255)
     executed_at = models.DateTimeField(default=timezone.now)
