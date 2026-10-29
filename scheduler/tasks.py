@@ -306,3 +306,57 @@ def hourly_status_check_task(self):
             details={'error': str(exc)}
         )
         raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))
+
+
+@shared_task(bind=True, max_retries=3, default_retry_delay=30)
+def failure_notification_task(self, failed_task_name, error_message, payload=None):
+    logger.warning(f"ALERT: Task {failed_task_name} encountered an error: {error_message}")
+    PeriodicTaskLog.objects.create(
+        task_name='failure_notification_task',
+        executed_at=timezone.now(),
+        status='NOTIFICATION_SENT',
+        details={
+            'target_task': failed_task_name,
+            'error': error_message,
+            'payload': payload
+        }
+    )
+    return {'notification': 'logged', 'task': failed_task_name}
+
+
+@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+def execute_dynamic_task(self, task_type='generic', payload=None):
+    payload = payload or {}
+    now = timezone.now()
+    try:
+        result = {
+            'executed_at': now.isoformat(),
+            'task_type': task_type,
+            'processed_payload': payload,
+            'status': 'SUCCESS'
+        }
+        PeriodicTaskLog.objects.create(
+            task_name=f"dynamic:{task_type}",
+            executed_at=now,
+            status='SUCCESS',
+            details=result
+        )
+        logger.info(f"Dynamic task '{task_type}' executed successfully")
+        return result
+    except Exception as exc:
+        logger.error(f"Dynamic task '{task_type}' failed: {exc}")
+        PeriodicTaskLog.objects.create(
+            task_name=f"dynamic:{task_type}",
+            executed_at=timezone.now(),
+            status='FAILED',
+            details={'error': str(exc), 'payload': payload}
+        )
+        if self.request.retries >= self.max_retries:
+            failure_notification_task.delay(
+                failed_task_name=f"dynamic:{task_type}",
+                error_message=str(exc),
+                payload=payload
+            )
+        countdown = 30 * (2 ** self.request.retries)
+        raise self.retry(exc=exc, countdown=countdown)
+
