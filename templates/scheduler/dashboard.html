@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celery Beat & Task Scheduler Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .card { border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-card { border-left: 4px solid #3b82f6; }
+        .badge-status { font-weight: 500; padding: 0.35em 0.65em; }
+        .table th { background-color: #f1f5f9; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; }
+        .table td { vertical-align: middle; font-size: 0.9rem; }
+        pre code { font-size: 0.8rem; }
+    </style>
+</head>
+<body class="py-4">
+    <div class="container-fluid px-4">
+        <header class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+            <div>
+                <h3 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Celery Beat & Task Scheduler</h3>
+                <small class="text-muted">Distributed Periodic Tasks, Dynamic Task Engine & Email Automation</small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success py-2 px-3"><i class="bi bi-check-circle me-1"></i>Redis: Online</span>
+                <span class="badge bg-secondary py-2 px-3">UTC: {{ current_time_utc|date:"Y-m-d H:i:s" }}</span>
+                <a href="/admin/" target="_blank" class="btn btn-sm btn-outline-dark"><i class="bi bi-shield-lock me-1"></i>Django Admin</a>
+            </div>
+        </header>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card p-3 stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small">Periodic Tasks</div>
+                            <div class="h3 fw-bold mb-0">{{ total_periodic_tasks }}</div>
+                            <small class="text-success">{{ enabled_tasks_count }} Active in Beat</small>
+                        </div>
+                        <i class="bi bi-arrow-repeat text-primary h1 mb-0 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 stat-card" style="border-left-color: #10b981;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small">Emails Scheduled</div>
+                            <div class="h3 fw-bold mb-0">{{ total_emails }}</div>
+                            <small class="text-success">{{ sent_emails }} Sent</small> / <small class="text-warning">{{ pending_emails }} Pending</small>
+                        </div>
+                        <i class="bi bi-envelope-paper text-success h1 mb-0 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 stat-card" style="border-left-color: #8b5cf6;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small">Registered Users</div>
+                            <div class="h3 fw-bold mb-0">{{ total_users }}</div>
+                            <small class="text-muted">With timezone preferences</small>
+                        </div>
+                        <i class="bi bi-people text-purple h1 mb-0 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 stat-card" style="border-left-color: #f59e0b;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small">API Endpoints</div>
+                            <div class="h4 fw-bold mb-0 text-dark">5 Endpoints</div>
+                            <small class="text-muted">REST API Ready</small>
+                        </div>
+                        <i class="bi bi-code-square text-warning h1 mb-0 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white py-3 fw-bold text-dark d-flex align-items-center">
+                        <i class="bi bi-send text-primary me-2"></i>Quick Schedule Email
+                    </div>
+                    <div class="card-body">
+                        <form id="emailForm">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Recipient Email</label>
+                                <input type="email" class="form-control form-control-sm" id="emailRecipient" placeholder="user@example.com" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Subject</label>
+                                <input type="text" class="form-control form-control-sm" id="emailSubject" placeholder="Welcome aboard!" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Body</label>
+                                <textarea class="form-control form-control-sm" id="emailBody" rows="2" placeholder="Message content..." required></textarea>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">Schedule Time (Optional)</label>
+                                    <input type="datetime-local" class="form-control form-control-sm" id="emailScheduleTime">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">User Timezone</label>
+                                    <select class="form-select form-select-sm" id="emailTimezone">
+                                        <option value="UTC" selected>UTC</option>
+                                        <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                                        <option value="America/New_York">America/New_York (EST)</option>
+                                        <option value="Europe/London">Europe/London (GMT)</option>
+                                        <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-calendar-plus me-1"></i>Submit via /api/schedule-email/</button>
+                        </form>
+                        <div id="emailAlert" class="mt-2" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white py-3 fw-bold text-dark d-flex align-items-center">
+                        <i class="bi bi-plus-circle text-primary me-2"></i>Quick Dynamically Schedule Task
+                    </div>
+                    <div class="card-body">
+                        <form id="taskForm">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Task Name / Path</label>
+                                <input type="text" class="form-control form-control-sm" id="taskName" value="scheduler.tasks.execute_dynamic_task" required>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">Schedule Type</label>
+                                    <select class="form-select form-select-sm" id="taskScheduleType">
+                                        <option value="interval" selected>Interval (Recurring)</option>
+                                        <option value="crontab">Crontab (Advanced Expression)</option>
+                                        <option value="one_time">One-Time (Clocked)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6" id="intervalInputWrapper">
+                                    <label class="form-label small fw-semibold">Interval Every</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" class="form-control" id="taskIntervalEvery" value="60" min="1">
+                                        <select class="form-select" id="taskIntervalPeriod">
+                                            <option value="seconds" selected>seconds</option>
+                                            <option value="minutes">minutes</option>
+                                            <option value="hours">hours</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" id="crontabInputWrapper" style="display: none;">
+                                    <label class="form-label small fw-semibold">Crontab Expression</label>
+                                    <input type="text" class="form-control form-control-sm" id="taskCrontabExpr" placeholder="30 10 * * 1-5">
+                                </div>
+                                <div class="col-md-6" id="clockedInputWrapper" style="display: none;">
+                                    <label class="form-label small fw-semibold">Execution Time</label>
+                                    <input type="datetime-local" class="form-control form-control-sm" id="taskClockedTime">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Payload (JSON args/kwargs)</label>
+                                <input type="text" class="form-control form-control-sm" id="taskPayload" value='{"action": "health_ping", "metric": 100}'>
+                            </div>
+                            <button type="submit" class="btn btn-dark btn-sm w-100"><i class="bi bi-clock-fill me-1"></i>Submit via /api/schedule-task/</button>
+                        </form>
+                        <div id="taskAlert" class="mt-2" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-white py-3 fw-bold text-dark d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-list-task text-primary me-2"></i>Active Celery Beat Periodic Tasks (DatabaseScheduler)</span>
+                <a href="/api/scheduled-tasks/" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-box-arrow-up-right me-1"></i>/api/scheduled-tasks/</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Task Name</th>
+                            <th>Execution Target</th>
+                            <th>Schedule Expression</th>
+                            <th>Status</th>
+                            <th>Total Runs</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pt in periodic_tasks %}
+                        <tr>
+                            <td><code>#{{ pt.id }}</code></td>
+                            <td class="fw-semibold">{{ pt.name }}</td>
+                            <td><code>{{ pt.task }}</code></td>
+                            <td>
+                                {% if pt.crontab %}
+                                    <span class="badge bg-primary text-white"><i class="bi bi-calendar-event me-1"></i>{{ pt.crontab.minute }} {{ pt.crontab.hour }} {{ pt.crontab.day_of_month }} {{ pt.crontab.month_of_year }} {{ pt.crontab.day_of_week }} ({{ pt.crontab.timezone }})</span>
+                                {% elif pt.interval %}
+                                    <span class="badge bg-info text-dark"><i class="bi bi-stopwatch me-1"></i>Every {{ pt.interval.every }} {{ pt.interval.period }}</span>
+                                {% elif pt.clocked %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-alarm me-1"></i>Clocked: {{ pt.clocked.clocked_time|date:"Y-m-d H:i:s" }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Manual</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if pt.enabled %}
+                                    <span class="badge bg-success badge-status">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary badge-status">Disabled</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ pt.total_run_count }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="cancelTask('{{ pt.id }}')"><i class="bi bi-trash"></i> Cancel</button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7" class="text-center text-muted py-3">No periodic tasks registered.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white py-3 fw-bold text-dark">
+                        <i class="bi bi-envelope-check text-success me-2"></i>Recent Scheduled & Sent Emails
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Subject / To</th>
+                                    <th>Category</th>
+                                    <th>Scheduled Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for em in scheduled_emails %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">{{ em.subject }}</div>
+                                        <small class="text-muted">{{ em.recipient_email }}</small>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ em.category }}</span></td>
+                                    <td><small>{{ em.scheduled_time|date:"M d, H:i:s" }}</small></td>
+                                    <td>
+                                        {% if em.status == 'SENT' %}
+                                            <span class="badge bg-success badge-status">SENT</span>
+                                        {% elif em.status == 'PENDING' %}
+                                            <span class="badge bg-warning text-dark badge-status">PENDING</span>
+                                        {% elif em.status == 'FAILED' %}
+                                            <span class="badge bg-danger badge-status">FAILED</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary badge-status">{{ em.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted py-3">No scheduled emails recorded yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white py-3 fw-bold text-dark d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-activity text-primary me-2"></i>Task Execution Logs (History)</span>
+                        <a href="/api/task-history/" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-box-arrow-up-right me-1"></i>/api/task-history/</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th>Executed At</th>
+                                    <th>Status</th>
+                                    <th>Summary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in recent_logs %}
+                                <tr>
+                                    <td><code>{{ log.task_name }}</code></td>
+                                    <td><small>{{ log.executed_at|date:"H:i:s" }}</small></td>
+                                    <td>
+                                        {% if log.status == 'SUCCESS' %}
+                                            <span class="badge bg-success badge-status">SUCCESS</span>
+                                        {% elif log.status == 'NOTIFICATION_SENT' %}
+                                            <span class="badge bg-warning text-dark badge-status">NOTIFIED</span>
+                                        {% else %}
+                                            <span class="badge bg-danger badge-status">{{ log.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><small class="text-muted font-monospace">{{ log.details|truncatechars:40 }}</small></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted py-3">No logs recorded yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 bg-light">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-terminal me-2"></i>Available REST API Endpoints Quick Reference:</h6>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="bg-white p-2 rounded border">
+                            <span class="badge bg-primary">POST</span> <code>/api/schedule-task/</code>
+                            <div class="small text-muted mt-1">Schedule dynamic one-off, interval, or crontab tasks.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-white p-2 rounded border">
+                            <span class="badge bg-primary">POST</span> <code>/api/schedule-email/</code>
+                            <div class="small text-muted mt-1">Schedule emails for delayed or immediate dispatch.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-white p-2 rounded border">
+                            <span class="badge bg-success">GET</span> <code>/api/scheduled-tasks/</code>
+                            <div class="small text-muted mt-1">List all database-backed scheduled periodic tasks.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-white p-2 rounded border">
+                            <span class="badge bg-danger">POST / DEL</span> <code>/api/cancel-task/&lt;id&gt;/</code>
+                            <div class="small text-muted mt-1">Cancel or delete a scheduled task.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('taskScheduleType').addEventListener('change', function() {
+            const val = this.value;
+            document.getElementById('intervalInputWrapper').style.display = (val === 'interval') ? 'block' : 'none';
+            document.getElementById('crontabInputWrapper').style.display = (val === 'crontab') ? 'block' : 'none';
+            document.getElementById('clockedInputWrapper').style.display = (val === 'one_time') ? 'block' : 'none';
+        });
+
+        document.getElementById('emailForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const alertBox = document.getElementById('emailAlert');
+            alertBox.style.display = 'none';
+
+            const payload = {
+                recipient_email: document.getElementById('emailRecipient').value,
+                subject: document.getElementById('emailSubject').value,
+                body: document.getElementById('emailBody').value,
+                timezone: document.getElementById('emailTimezone').value,
+                schedule_time: document.getElementById('emailScheduleTime').value || null
+            };
+
+            try {
+                const res = await fetch('/api/schedule-email/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                alertBox.className = res.ok ? 'alert alert-success' : 'alert alert-danger';
+                alertBox.textContent = res.ok ? 'Email scheduled successfully!' : (data.error || JSON.stringify(data));
+                alertBox.style.display = 'block';
+                if (res.ok) setTimeout(() => location.reload(), 1200);
+            } catch (err) {
+                alertBox.className = 'alert alert-danger';
+                alertBox.textContent = 'Request failed: ' + err;
+                alertBox.style.display = 'block';
+            }
+        });
+
+        document.getElementById('taskForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const alertBox = document.getElementById('taskAlert');
+            alertBox.style.display = 'none';
+
+            const stype = document.getElementById('taskScheduleType').value;
+            let rawPayload = {};
+            try {
+                rawPayload = JSON.parse(document.getElementById('taskPayload').value || '{}');
+            } catch (e) {
+                rawPayload = {'raw': document.getElementById('taskPayload').value};
+            }
+
+            const payload = {
+                task_name: document.getElementById('taskName').value,
+                schedule_type: stype,
+                args: ['dynamic_request'],
+                kwargs: {'payload': rawPayload}
+            };
+
+            if (stype === 'interval') {
+                payload.interval_every = parseInt(document.getElementById('taskIntervalEvery').value);
+                payload.interval_period = document.getElementById('taskIntervalPeriod').value;
+            } else if (stype === 'crontab') {
+                payload.crontab_expr = document.getElementById('taskCrontabExpr').value;
+            } else if (stype === 'one_time') {
+                payload.schedule_time = document.getElementById('taskClockedTime').value;
+            }
+
+            try {
+                const res = await fetch('/api/schedule-task/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                alertBox.className = res.ok ? 'alert alert-success' : 'alert alert-danger';
+                alertBox.textContent = res.ok ? 'Task scheduled successfully!' : (data.error || JSON.stringify(data));
+                alertBox.style.display = 'block';
+                if (res.ok) setTimeout(() => location.reload(), 1200);
+            } catch (err) {
+                alertBox.className = 'alert alert-danger';
+                alertBox.textContent = 'Request failed: ' + err;
+                alertBox.style.display = 'block';
+            }
+        });
+
+        async function cancelTask(taskId) {
+            if (!confirm(`Cancel/Delete scheduled task #${taskId}?`)) return;
+            try {
+                const res = await fetch(`/api/cancel-task/${taskId}/`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to cancel'));
+                }
+            } catch (err) {
+                alert('Request failed: ' + err);
+            }
+        }
+    </script>
+</body>
+</html>
+
